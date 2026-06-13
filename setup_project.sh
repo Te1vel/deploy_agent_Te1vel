@@ -125,6 +125,8 @@ else
     exit 1
 fi
 
+echo "........................................"
+
 # Now I'm going to ask the user if they want to update the attendance thresholds in the config file
 
 read -r -p "You want to update the attendance thresholds?[Y/N]: " choice
@@ -146,15 +148,32 @@ case "$choice" in
       echo "Threshold updated successfully to $warning% and $failure%"
     else
       echo "Error: Thresholds must be numeric values. Update aborted."
-
     fi
     
 
     ;;
   [Nn]*)
-      echo "Keeping default thresholds (75% and 50%)"
+      echo "Retaining default thresholds 75% and 50%"
     ;;
     *)
-      echo "Invalid input skipping updates..."
       exit 1
 esac
+
+echo "........................................."
+
+# Archiving once the setup is interrupted 
+
+archiving(){
+  echo -e "[!]\n The Process is interupted... \n Archiving current state..."
+
+  if [[ -d "$directory_name" ]]; then
+    tar -czf "attendance_tracker_${version}_archive" "$directory_name"
+    echo "Progress Archived in attendance_tracker_${version}_archive"
+
+    rm -r "$directory_name"
+    echo "Removing $directory_name"
+  fi
+  exit 1
+}
+
+trap archiving SIGINT
