@@ -109,3 +109,18 @@ else
     echo "Error: config.json missing."
     exit 1
 fi
+
+# Copying the expected reports.log output to the reports directory
+
+echo '--- Attendance Report Run: 2026-02-06 18:10:01.468726 ---
+[2026-02-06 18:10:01.469363] ALERT SENT TO bob@example.com: URGENT: Bob Smith, your attendance is 46.7%. You will fail this class.
+[2026-02-06 18:10:01.469424] ALERT SENT TO charlie@example.com: URGENT: Charlie Davis, your attendance is 26.7%. You will fail this class.
+' > "$directory_name/reports/reports.log"
+
+if [ -f "$directory_name/reports/reports.log" ]; then
+    echo "Verification successful: reports.log is present."
+    
+else
+    echo "Error: reports.log missing."
+    exit 1
+fi
