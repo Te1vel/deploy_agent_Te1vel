@@ -70,6 +70,7 @@ if [ -f "$directory_name/attendance_checker.py" ]; then
     echo "Verification successful: attendance_checker.py is present."
 else
     echo "Error: attendance_checker.py missing."
+    exit 1
 fi
 
 # Copying the assets.csv file to the Helpers directory
@@ -87,5 +88,24 @@ if [ -f "$directory_name/Helpers/assets.csv" ]; then
 
 else
     echo "Error: assets.csv missing."
-    
+    exit 1
+fi
+
+# Copying the config.json file to the Helpers directory
+
+echo '{
+    "thresholds": {
+        "warning": 75,
+        "failure": 50
+    },
+    "run_mode": "live",
+    "total_sessions": 15
+}
+' > "$directory_name/Helpers/config.json"
+
+if [ -f "$directory_name/Helpers/config.json" ]; then
+    echo "Verification successful: config.json is present."
+else
+    echo "Error: config.json missing."
+    exit 1
 fi
