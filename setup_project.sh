@@ -71,3 +71,21 @@ if [ -f "$directory_name/attendance_checker.py" ]; then
 else
     echo "Error: attendance_checker.py missing."
 fi
+
+# Copying the assets.csv file to the Helpers directory
+
+echo 'Email,Names,Attendance Count,Absence Count
+alice@example.com,Alice Johnson,14,1
+bob@example.com,Bob Smith,7,8
+charlie@example.com,Charlie Davis,4,11
+diana@example.com,Diana Prince,15,0
+' > "$directory_name/Helpers/assets.csv"
+
+if [ -f "$directory_name/Helpers/assets.csv" ]; then
+    echo "Verification successful: assets.csv is present."
+   
+
+else
+    echo "Error: assets.csv missing."
+    
+fi
