@@ -10,9 +10,10 @@ directory_name="attendance_tracker_$version"
 mkdir -p "$directory_name"/{Helpers,reports}
 
 if [ -d "$directory_name" ]; then
-    echo "Directory $directory_name created successfully"
+    echo "Directory $directory_name created"
 else
-    echo "ERROR: Directory creation failed"
+    echo "Directory creation failed"
+    rm -r "$directory_name"
     exit 1
 fi
 
@@ -67,9 +68,10 @@ if __name__ == "__main__":
 # Verifying the existence of attendance_checker.py
 
 if [ -f "$directory_name/attendance_checker.py" ]; then
-    echo "Verification successful: attendance_checker.py is present."
+    echo "Verification: attendance_checker.py is present."
 else
-    echo "Error: attendance_checker.py missing."
+    echo "attendance_checker.py missing."
+    rm -r "$directory_name"
     exit 1
 fi
 
@@ -83,11 +85,12 @@ diana@example.com,Diana Prince,15,0
 ' > "$directory_name/Helpers/assets.csv"
 
 if [ -f "$directory_name/Helpers/assets.csv" ]; then
-    echo "Verification successful: assets.csv is present."
+    echo "Verification: assets.csv is present."
    
 
 else
-    echo "Error: assets.csv missing."
+    echo "assets.csv missing."
+    rm -r "$directory_name"
     exit 1
 fi
 
@@ -104,9 +107,10 @@ echo '{
 ' > "$directory_name/Helpers/config.json"
 
 if [ -f "$directory_name/Helpers/config.json" ]; then
-    echo "Verification successful: config.json is present."
+    echo "Verification: config.json is present."
 else
-    echo "Error: config.json missing."
+    echo "config.json missing."
+    rm -r "$directory_name"
     exit 1
 fi
 
@@ -118,10 +122,10 @@ echo '--- Attendance Report Run: 2026-02-06 18:10:01.468726 ---
 ' > "$directory_name/reports/reports.log"
 
 if [ -f "$directory_name/reports/reports.log" ]; then
-    echo "Verification successful: reports.log is present."
+    echo "Verification: reports.log is present."
     
 else
-    echo "Error: reports.log missing."
+    echo "reports.log missing."
     exit 1
 fi
 
@@ -133,29 +137,42 @@ read -r -p "You want to update the attendance thresholds?[Y/N]: " choice
 
 case "$choice" in
   [Yy]*)
-    read -r -p "Enter warning threshold(default 75%): " warning
+  while true; do
+    read -r -p "Warning threshold(default 75%): " warning
     warning=${warning:-75}
     warning=${warning%[%]*}
-    read -r -p "Enter failure threshold(default 50%): " failure
+
+    if [[ "$warning" =~ ^[0-9]+$ && "$warning" -le 100 ]]; then
+      break
+    else
+      echo "Enter a valid input from 0 to 100"
+    fi
+    done
+  while true; do
+    read -r -p "Failure threshold(default 50%): " failure
     failure=${failure:-50}
     failure=${failure%[%]*}
-
-    if [[ "$warning" =~ ^[0-9]+$ && "$failure" =~ ^[0-9]+$ ]]; then
-
-      sed -i "s/75/$warning/g" "$directory_name/Helpers/config.json"
-      sed -i "s/50/$failure/g" "$directory_name/Helpers/config.json"
-
-      echo "Threshold updated successfully to $warning% and $failure%"
-    else
-      echo "Error: Thresholds must be numeric values. Update aborted."
-    fi
     
+    if [[ "$failure" =~ ^[0-9]+$ && "$failure" -le 100 ]]; then
+      break
+    else
+      echo "Enter a valid input from 0 to 100"
+    fi
+  done
+
+    sed -i "s/\"warning\": [0-9]*/\"warning\": $warning/" "$directory_name/Helpers/config.json"
+    sed -i "s/\"failure\": [0-9]*/\"failure\": $failure/" "$directory_name/Helpers/config.json"
+
+    echo "Threshold updated successfully to $warning% and $failure%"
 
     ;;
   [Nn]*)
-      echo "Retaining default thresholds 75% and 50%"
+      echo "Keeping default thresholds (75% and 50%)"
     ;;
     *)
+      echo "Input invalid. Keeping default thresholds. Please enter Y or N next time."
+      echo "Deleting the created directory $directory_name"
+      rm -r "$directory_name"
       exit 1
 esac
 
@@ -164,14 +181,13 @@ echo "........................................."
 # Archiving once the setup is interrupted 
 
 archiving(){
-  echo -e "[!]\n The Process is interupted... \n Archiving current state..."
+  echo "Interrupt signal received. Archiving progress"
 
   if [[ -d "$directory_name" ]]; then
     tar -czf "attendance_tracker_${version}_archive" "$directory_name"
     echo "Progress Archived in attendance_tracker_${version}_archive"
-
     rm -r "$directory_name"
-    echo "Removing $directory_name"
+    echo "Deleted $directory_name"
   fi
   exit 1
 }
