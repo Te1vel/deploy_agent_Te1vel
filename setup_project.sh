@@ -126,6 +126,7 @@ if [ -f "$directory_name/reports/reports.log" ]; then
     
 else
     echo "reports.log missing."
+    rm -r "$directory_name"
     exit 1
 fi
 
@@ -136,44 +137,44 @@ echo "........................................"
 read -r -p "You want to update the attendance thresholds?[Y/N]: " choice
 
 case "$choice" in
-  [Yy]*)
-  while true; do
-    read -r -p "Warning threshold(default 75%): " warning
-    warning=${warning:-75}
-    warning=${warning%[%]*}
+    [Yy]*)
+        while true; do
+            read -r -p "Warning threshold(default 75%): " warning
+            warning=${warning:-75}
+            warning=${warning%[%]*}
+            
+            # Use awk to validate decimals between 0 and 100
+            if awk "BEGIN {exit !($warning >= 0 && $warning <= 100)}"; then
+                break
+            else
+                echo "Enter a valid input from 0 to 100"
+            fi
+        done
+        while true; do
+            read -r -p "Failure threshold(default 50%): " failure
+            failure=${failure:-50}
+            failure=${failure%[%]*}
 
-    if [[ "$warning" =~ ^[0-9]+$ && "$warning" -le 100 ]]; then
-      break
-    else
-      echo "Enter a valid input from 0 to 100"
-    fi
-    done
-  while true; do
-    read -r -p "Failure threshold(default 50%): " failure
-    failure=${failure:-50}
-    failure=${failure%[%]*}
-    
-    if [[ "$failure" =~ ^[0-9]+$ && "$failure" -le 100 ]]; then
-      break
-    else
-      echo "Enter a valid input from 0 to 100"
-    fi
-  done
+            if awk "BEGIN {exit !($failure >= 0 && $failure <= 100)}"; then
+                break
+            else
+                echo "Enter a valid input from 0 to 100"
+            fi
+        done
+        sed -i "s/\"warning\": [0-9.]*/\"warning\": $warning/" "$directory_name/Helpers/config.json"
+        sed -i "s/\"failure\": [0-9.]*/\"failure\": $failure/" "$directory_name/Helpers/config.json"
 
-    sed -i "s/\"warning\": [0-9]*/\"warning\": $warning/" "$directory_name/Helpers/config.json"
-    sed -i "s/\"failure\": [0-9]*/\"failure\": $failure/" "$directory_name/Helpers/config.json"
-
-    echo "Threshold updated successfully to $warning% and $failure%"
-
-    ;;
-  [Nn]*)
-      echo "Keeping default thresholds (75% and 50%)"
-    ;;
+        echo "Threshold updated successfully to $warning% and $failure%"
+        ;;
+    [Nn]*)
+        echo "Keeping default thresholds (75% and 50%)"
+        ;;
     *)
-      echo "Input invalid. Keeping default thresholds. Please enter Y or N next time."
-      echo "Deleting the created directory $directory_name"
-      rm -r "$directory_name"
-      exit 1
+        echo "Input invalid. Keeping default thresholds. Please enter Y or N next time."
+        echo "Deleting the created directory $directory_name"
+        rm -r "$directory_name"
+        exit 1
+        ;;
 esac
 
 echo "........................................."
