@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
 
+# Checking if python3 is installed on the system
+
+if python3 --version &> /dev/null; then
+    echo "Python is installed on the system"
+else
+    echo "Python missing...First install python"
+    exit 1
+fi
+
 # I'm going to start of by creating the main directory and sub directories
-echo "Creating project directory structure"
+echo "Creating Student attendance Tracker structure"
 echo "......................................."
-read -r -p "Enter project name identifier: " version
+read -r -p "Enter Student attendance Tracker identifier: " version
 
 directory_name="attendance_tracker_$version"
 
@@ -68,9 +77,9 @@ if __name__ == "__main__":
 # Verifying the existence of attendance_checker.py
 
 if [ -f "$directory_name/attendance_checker.py" ]; then
-    echo "Verification: attendance_checker.py is present."
+    echo "attendance_checker.py is present."
 else
-    echo "attendance_checker.py missing."
+    echo -e "attendance_checker.py missing. /nDeleting the created directory $directory_name"
     rm -r "$directory_name"
     exit 1
 fi
@@ -85,11 +94,11 @@ diana@example.com,Diana Prince,15,0
 ' > "$directory_name/Helpers/assets.csv"
 
 if [ -f "$directory_name/Helpers/assets.csv" ]; then
-    echo "Verification: assets.csv is present."
+    echo "assets.csv is present."
    
 
 else
-    echo "assets.csv missing."
+    echo -e "assets.csv missing. /nDeleting the created directory $directory_name"
     rm -r "$directory_name"
     exit 1
 fi
@@ -107,9 +116,9 @@ echo '{
 ' > "$directory_name/Helpers/config.json"
 
 if [ -f "$directory_name/Helpers/config.json" ]; then
-    echo "Verification: config.json is present."
+    echo "config.json is present."
 else
-    echo "config.json missing."
+    echo -e "config.json missing. /nDeleting the created directory $directory_name"
     rm -r "$directory_name"
     exit 1
 fi
@@ -122,10 +131,10 @@ echo '--- Attendance Report Run: 2026-02-06 18:10:01.468726 ---
 ' > "$directory_name/reports/reports.log"
 
 if [ -f "$directory_name/reports/reports.log" ]; then
-    echo "Verification: reports.log is present."
+    echo "reports.log is present."
     
 else
-    echo "reports.log missing."
+    echo -e "reports.log missing. /nDeleting the created directory $directory_name"
     rm -r "$directory_name"
     exit 1
 fi
