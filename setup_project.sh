@@ -10,6 +10,7 @@ else
 fi
 
 # I'm going to start of by creating the main directory and sub directories
+
 echo "Creating Student attendance Tracker structure"
 echo "......................................."
 read -r -p "Enter Student attendance Tracker identifier: " version
@@ -141,7 +142,7 @@ fi
 
 echo "........................................"
 
-# Now I'm going to ask the user if they want to update the attendance thresholds in the config file
+# Now I'm going to ask the user if they want to update the attendance thresholds in the config.json file
 
 read -r -p "You want to update the attendance thresholds?[Y/N]: " choice
 
@@ -152,7 +153,6 @@ case "$choice" in
             warning=${warning:-75}
             warning=${warning%[%]*}
             
-            # Use awk to validate decimals between 0 and 100
             if awk "BEGIN {exit !($warning >= 0 && $warning <= 100)}"; then
                 break
             else
@@ -179,8 +179,7 @@ case "$choice" in
         echo "Keeping default thresholds (75% and 50%)"
         ;;
     *)
-        echo "Input invalid. Keeping default thresholds. Please enter Y or N next time."
-        echo "Deleting the created directory $directory_name"
+        echo -e "Input invalid. Keeping default thresholds. Please enter Y or N next time. /nDeleting the created directory $directory_name"
         rm -r "$directory_name"
         exit 1
         ;;
