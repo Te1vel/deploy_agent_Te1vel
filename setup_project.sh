@@ -9,6 +9,14 @@ else
     exit 1
 fi
 
+# Checking if my script can really write in the directory it was ran from 
+
+if [ ! -w "." ]; then
+    echo "Error: You do not have write permissions in this directory ($(pwd))."
+    echo "Please run this script in a location where you can create files."
+    exit 1
+fi
+
 # I'm going to start of by creating the main directory and sub directories
 
 echo "Creating Student attendance Tracker structure"
@@ -179,7 +187,7 @@ case "$choice" in
         echo "Keeping default thresholds (75% and 50%)"
         ;;
     *)
-        echo -e "Input invalid. Keeping default thresholds. Please enter Y or N next time. /nDeleting the created directory $directory_name"
+        echo -e "Input invalid. Please press the Y or N keyboard keys next time. /nDeleting the created directory $directory_name"
         rm -r "$directory_name"
         exit 1
         ;;
